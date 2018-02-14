@@ -38,10 +38,10 @@ def add_sheet(gss_client, key, name, row, col):
 def check(l, data, i):
     data[i-1][1] = float(data[i-1][1])
     l[i][1] = float(l[i][1])
-    return data[i-1] == l[i][:4]
+    return data[i-1] == l[i][:4] # l[0] is not part of payout history
 
 def look_into_sheet(l, data):
-    for i in range(1, len(data)-1):
+    for i in range(1, len(data)): # data[len(data)-2] is the latest payout record
         try:
             check(l, data, i)
         except:
@@ -54,9 +54,9 @@ def update_sheet(gss_client, key, data):
     list_of_lists = sheet.get_all_values()
     n_records = look_into_sheet(list_of_lists, data)
     if n_records == len(data)-1:
-        print('No need to update!')
+        print('Everything up-to-date')
     else:
-        print('%d records are not on the sheet!' % (len(data)-1 - n_records))
+        print('%d record(s) not on the sheet!' % (len(data)-1 - n_records))
         for i in range(n_records, len(data)-1):
             sheet.insert_row(data[i], i+2)
         sheet.update_acell('E2', data[len(data)-1])
