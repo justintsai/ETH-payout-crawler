@@ -66,7 +66,7 @@ spreadsheetId = '1pAed6_SMO34Jet_BADdE6c2L8iiCMtFxnGNTJ2MSQCg'
 
 def main():
     sys.path = '/Users/Justin/Documents/Projects/ETH payout crawler/'
-    url = 'https://eth-tw.gpumine.org/api/miner/0xeB8afFBcCb50c74e9dFf208C7d4bD48e0a06C336'
+    url = 'https://eth-tw.gpumine.org/api/bill/0xeB8afFBcCb50c74e9dFf208C7d4bD48e0a06C336'
     
     auth_json_path = sys.path + 'GPUMINEPOOL-8cef42f493a3.json'
     gss_scope = ['https://spreadsheets.google.com/feeds']
