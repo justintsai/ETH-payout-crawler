@@ -10,6 +10,9 @@ import re
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
+# Use APScheduler on non-Unix-like systems (which lack daemons like 'at' or 'cron')
+# from apscheduler.schedulers.blocking import BlockingScheduler
+
 def get_data(url):
     data = []
     response = requests.get(url)
@@ -79,6 +82,12 @@ def main():
         update_sheet(gss_client, spreadsheetId, get_data(url))
         
 if __name__ == '__main__':
+# def job():
     start_time = time.time()
     main()
-    print("--- %s seconds ---" % (time.time() - start_time))
+    print("--- took %s seconds ---" % (time.time() - start_time))
+
+# scheduler = BlockingScheduler()
+# scheduler.add_job(job, 'cron', day='*/3', hour=16, minute=30)
+# print(scheduler.get_jobs())
+# scheduler.start()
