@@ -12,7 +12,6 @@ from oauth2client.service_account import ServiceAccountCredentials
 # Use APScheduler on non-Unix-like systems (which lack daemons like 'at' or 'cron')
 # from apscheduler.schedulers.blocking import BlockingScheduler
 
-
 def get_data(url):
     data = []
     response = requests.get(url)
@@ -21,11 +20,14 @@ def get_data(url):
 
     for i in range(len(json_obj['payments'])):
         data.append([])
+    for i in range(len(json_obj['payments'])):
+        j = len(json_obj['payments']) -1 - i
         for key, value in json_obj['payments'][i].items():
-            data[i].append(value)
-        data[i][0] = timestamp_datetime(data[i][0])
+            data[j].append(value)
+        data[j][2], data[j][3] = data[j][3], data[j][2]
+        data[j][0] = timestamp_datetime(data[j][0])
     data.append(json_obj['totalPaid'])
-    # len(data) <= 31 since the json only stores the latest 30 payment
+    # len(data) <= 32 since the json only stores the latest 31 payment
     return data
 
 
@@ -54,7 +56,6 @@ def look_into_sheet(table, data):
     for i in range(len(data)-1, 0, -1):
         data[i-1][1] = round(float(data[i-1][1]), 8)
         table[-1][1] = float(table[-1][1])
-        print(data[i-1], table[-1])
         if table[-1][0] == data[i-1][0]:
             return i-1  # if i-1 == 29, nothing to update
 
@@ -70,7 +71,9 @@ def update_sheet(gss_client, key, data):
         print('%d record(s) not on the sheet!' % (len(data)-2 - n_records))
         for i in range(1, len(data)-n_records-1):
             sheet.insert_row(data[n_records+i], len(table)+i)
+            print(data[n_records+i], len(table)+i)
         sheet.update_acell('E2', data[len(data)-1])
+    print('Total Earned: {:.8f}'.format(data[len(data)-1]))
 
 
 spreadsheetId = '1pAed6_SMO34Jet_BADdE6c2L8iiCMtFxnGNTJ2MSQCg'
@@ -79,7 +82,7 @@ spreadsheetId = '1pAed6_SMO34Jet_BADdE6c2L8iiCMtFxnGNTJ2MSQCg'
 
 def main():
     sys.path = '/Users/Justin/Documents/Projects/ETH payout crawler/'
-    url = 'https://eth-tw.gpumine.org/api/bill/0xeB8afFBcCb50c74e9dFf208C7d4bD48e0a06C336'
+    url = 'https://gpumine.org/api/bill/0xeB8afFBcCb50c74e9dFf208C7d4bD48e0a06C336?coin=eth'
 
     auth_json_path = sys.path + 'GPUMINEPOOL-8cef42f493a3.json'
     gss_scope = ['https://spreadsheets.google.com/feeds']
@@ -96,7 +99,7 @@ if __name__ == '__main__':
     # def job():
     start_time = time.time()
     main()
-    print("--- took %s seconds ---" % (time.time() - start_time))
+    print("--- took %f seconds ---" % (time.time() - start_time))
 
 # scheduler = BlockingScheduler()
 # scheduler.add_job(job, 'cron', day='*/3', hour=16, minute=30)
